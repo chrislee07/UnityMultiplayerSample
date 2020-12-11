@@ -7,7 +7,7 @@ namespace NetworkMessages
     public enum Commands{
         PLAYER_UPDATE,
         SERVER_UPDATE,
-        HANDSHAKE,
+        PLAYER_CONNECTED,
         PLAYER_INPUT
     }
 
@@ -17,10 +17,10 @@ namespace NetworkMessages
     }
 
     [System.Serializable]
-    public class HandshakeMsg:NetworkHeader{
+    public class PlayerConMsg:NetworkHeader{
         public NetworkObjects.NetworkPlayer player;
-        public HandshakeMsg(){      // Constructor
-            cmd = Commands.HANDSHAKE;
+        public PlayerConMsg(){      // Constructor
+            cmd = Commands.PLAYER_CONNECTED;
             player = new NetworkObjects.NetworkPlayer();
         }
     }

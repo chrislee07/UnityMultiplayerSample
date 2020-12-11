@@ -5,6 +5,7 @@ using Unity.Networking.Transport;
 using NetworkMessages;
 using System;
 using System.Text;
+using System.Diagnostics;
 
 public class NetworkServer : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class NetworkServer : MonoBehaviour
         var endpoint = NetworkEndPoint.AnyIpv4;
         endpoint.Port = serverPort;
         if (m_Driver.Bind(endpoint) != 0)
-            Debug.Log("Failed to bind to port " + serverPort);
+            UnityEngine.Debug.Log("Failed to bind to port " + serverPort);
         else
             m_Driver.Listen();
 
@@ -39,7 +40,7 @@ public class NetworkServer : MonoBehaviour
 
     void OnConnect(NetworkConnection c){
         m_Connections.Add(c);
-        Debug.Log("Accepted a connection");
+        UnityEngine.Debug.Log("Accepted a connection");
 
         //// Example to send a handshake message:
         // HandshakeMsg m = new HandshakeMsg();
@@ -54,26 +55,27 @@ public class NetworkServer : MonoBehaviour
         NetworkHeader header = JsonUtility.FromJson<NetworkHeader>(recMsg);
 
         switch(header.cmd){
-            case Commands.HANDSHAKE:
-            HandshakeMsg hsMsg = JsonUtility.FromJson<HandshakeMsg>(recMsg);
-            Debug.Log("Handshake message received!");
+            case Commands.PLAYER_CONNECTED:
+                PlayerConMsg pcMsg = JsonUtility.FromJson<PlayerConMsg>(recMsg);
+                UnityEngine.Debug.Log("player connected message received!");
             break;
             case Commands.PLAYER_UPDATE:
-            PlayerUpdateMsg puMsg = JsonUtility.FromJson<PlayerUpdateMsg>(recMsg);
-            Debug.Log("Player update message received!");
+                PlayerUpdateMsg puMsg = JsonUtility.FromJson<PlayerUpdateMsg>(recMsg);
+                UnityEngine.Debug.Log("Player update message received! : " + recMsg);
+                SendToClient(recMsg, m_Connections[i]);
             break;
             case Commands.SERVER_UPDATE:
-            ServerUpdateMsg suMsg = JsonUtility.FromJson<ServerUpdateMsg>(recMsg);
-            Debug.Log("Server update message received!");
+                ServerUpdateMsg suMsg = JsonUtility.FromJson<ServerUpdateMsg>(recMsg);
+                UnityEngine.Debug.Log("Server update message received!");
             break;
             default:
-            Debug.Log("SERVER ERROR: Unrecognized message received!");
+                UnityEngine.Debug.Log("SERVER ERROR: Unrecognized message received!");
             break;
         }
     }
 
     void OnDisconnect(int i){
-        Debug.Log("Client disconnected from server");
+        UnityEngine.Debug.Log("Client disconnected from server");
         m_Connections[i] = default(NetworkConnection);
     }
 
